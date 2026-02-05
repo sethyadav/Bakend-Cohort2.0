@@ -1,3 +1,4 @@
+/* all*/
 const express = require("express")
 const noteModel = require("./models/notes.model")
 const app = express()
