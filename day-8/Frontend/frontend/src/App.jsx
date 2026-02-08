@@ -9,7 +9,7 @@ function App() {
   console.log("hello")
 
   function fetchNotes(){
-    axios.get('https://bakend-cohort2-0.onrender.com//api/notes')
+    axios.get('https://bakend-cohort2-0-5.onrender.com/api/notes')
      .then((res) => {
       setNotes(res.data.notes)
   })
@@ -27,7 +27,7 @@ function App() {
 
     console.log(title.value,description.value)
 
-    axios.post("https://bakend-cohort2-0.onrender.com//api/notes",{
+    axios.post("https://bakend-cohort2-0-5.onrender.com/api/notes",{
       title:title.value,
       description:description.value
     })
@@ -39,7 +39,7 @@ function App() {
   }
   
   function handleDeleteNote(noteId){
-    axios.delete("https://bakend-cohort2-0.onrender.com//api/notes/"+noteId)
+    axios.delete("https://bakend-cohort2-0-5.onrender.com/api/notes/"+noteId)
     .then(res=>{
       console.log(res.data)
       fetchNotes()
