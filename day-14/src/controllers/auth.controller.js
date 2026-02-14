@@ -1,5 +1,5 @@
 const userModel = require('../models/user.model');
-const crypto = require('crypto')
+const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 
 
@@ -7,24 +7,9 @@ const jwt = require("jsonwebtoken")
  async function registerController (req, res) {
     const {email,username,password,bio,profileImage } = req.body
 
-     const isUserExistsByUsername = await userModel.findOne({ username })
+     
 
-    // if (isUserExistsByEmail) {
-    //     return res.status(409).json({
-    //         message: "user already exits with same email"
-    //     })
-    // }
-
-    // const isUserExistsByUsername = await userModel.findOne({ username })
-
-    // if(isUserExistsByUsername){
-    //     return res.status(409).json({
-    //         message: "user already exists vy username"
-    //     })
-    // }
-
-
-    const isUserAlreadyExists = await userModel.findOne({
+     const isUserAlreadyExists = await userModel.findOne({
         $or: [
             { username},
             { email },
@@ -39,14 +24,14 @@ const jwt = require("jsonwebtoken")
         })
     }
 
-    const hash = crypto.createHash('sha256').update(password).digest('hex')
+    const hash = await bcrypt.hash(password, 10)
 
     const user = await userModel.create({
         username,
         email,
         bio,
         profileImage,
-        password:hash
+        password: hash
     })
 
     /* 
@@ -85,14 +70,14 @@ async function loginController(req,res) {
                 /**
                  * condition
                  */
-                username: username/*undefined*/
+                username: username  /*undefined*/
             },
             {
                 /**
                  * condition
                  */
 
-                email:email /* test@test.com */
+                email:email   /* test@test.com */
             }
         ]
     })
@@ -102,9 +87,8 @@ async function loginController(req,res) {
             message: "User not found"
         })
     }
-    const hash = crypto.createHash('sha256').update(password).digest('hex')
-
-    const isPasswordValid = hash == user.password
+   
+    const isPasswordValid = await bcrypt.compare(password, user.password)
 
     if (!isPasswordValid) {
         return res.status(401).json({
