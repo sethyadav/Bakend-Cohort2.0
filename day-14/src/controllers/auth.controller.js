@@ -40,10 +40,11 @@ const jwt = require("jsonwebtoken")
     */
 
     const token = jwt.sign({
-        id: user._id
+        id: user._id,
+        username: user.username
 
     },
-    process.env.jwt_SECRET,
+    process.env.JWT_SECRET,
     {expiresIn: "1d"}
     )
 
@@ -97,8 +98,8 @@ async function loginController(req,res) {
     }
 
     const token = jwt.sign(
-        { id: user._id},
-        process.env.jwt_SECRET,
+        { id: user._id, username: user.username},
+        process.env.JWT_SECRET,
         { expiresIn: "1d"}
     )
 
@@ -110,7 +111,7 @@ async function loginController(req,res) {
         user:{
             username:user.username,
             email:user.email,
-            bio:user,
+            bio:user.bio,
             profileImage:user.profileImage
         }   
     })
