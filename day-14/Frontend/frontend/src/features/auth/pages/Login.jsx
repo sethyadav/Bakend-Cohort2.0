@@ -36,7 +36,7 @@ const Login = () => {
                 <input onInput={(e) => {setUsername(e.target.value) }}
                  type= "text" name='username' id='username' placeholder='Enter username' />
 
-                <input onInput={(e) =>{setPassword0(e.target.value)}}
+                <input onInput={(e) =>{setPassword(e.target.value)}}
                  type= "password" name='password' id='password' placeholder='Enter password' />
                 <button className='button primary-button'>Login</button>
             </form>
