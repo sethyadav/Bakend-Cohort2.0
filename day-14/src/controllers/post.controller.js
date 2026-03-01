@@ -86,13 +86,14 @@ async function getPostDetailsController(req, res) {
 }
 
 async function likePostController(req, res ) {
+ try{
     const username = req.user.username
     const postId = req.params.postId
 
     const post = await postModel.findById(postId)
 
     if(!post) {
-        return res.status(40).json({
+        return res.status(400).json({
             message: "post not found."
         })
     }
@@ -106,29 +107,98 @@ async function likePostController(req, res ) {
         message: "Post liked successfully.",
         like
     })
+  } catch(error) {
+    console.log("Like Error", error)
+    res.status(500).json({message: "Server error"})
+  }
+  
 }
 
-async function getFeedController(req,res){
+async function unLikePostController(req, res){
+    const postId = req.params.postId
+    const username = req.user.username
 
-    const user = req.user
-
-    const posts = await Promise.all ((await postModel.find().populate("user").lean())
-       .map(async (post) => {
-           const isLiked = await likeModel.findOne({
-            user: user.username,
-            post: post._id
-           })
-
-           post.isLiked = !!isLiked
-
-           return post
-       }))
-
-
-     res.status(200).json({
-        message:"posts fetched successfuly.",
-        posts
+    const isLiked = await likeModel.findOne({
+        post: postId,
+        user: username
     })
+
+    if (!isLiked) {
+        return res.status(400).json({
+            message: "Post didn'n like "
+        })
+    }
+
+    await likeModel.findByIdAndDelete({ _id: isLiked._id})
+
+    return res.status(200).json({
+        message: "post un liked successfully."
+    })
+}
+
+// async function getFeedController(req,res){
+
+//     const user = req.user
+
+//     const posts = await Promise.all ((await postModel.find({})).sort({ _id: -1 }).populate("user").lean())
+//        posts.map(async (post) => {
+//            const isLiked = await likeModel.findOne({
+//             user: user.username,
+            
+//             post: post._id
+//            })
+
+//            post.isLiked = !! isLiked
+
+//            return post
+//        })
+
+
+//      res.status(200).json({
+//         message:"posts fetched successfuly.",
+//         posts
+//     })
+// }
+
+async function getFeedController(req, res) {
+    try {
+        const user = req.user
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Unauthorized user"
+            })
+        }
+
+        const posts = await postModel
+            .find({})
+            // .sort({ _id: -1 })
+            .populate("user")
+            .lean()
+
+        const updatedPosts = await Promise.all(
+            posts.map(async (post) => {
+                const isLiked = await likeModel.findOne({
+                    user: user.username,
+                    post: post._id
+                })
+
+                post.isLiked = !!isLiked
+                return post
+            })
+        )
+
+        return res.status(200).json({
+            message: "Posts fetched successfully",
+            posts: updatedPosts
+        })
+
+    } catch (error) {
+        console.log("Feed Error:", error)
+        return res.status(500).json({
+            message: "Server error"
+        })
+    }
 }
 
 module.exports = {
@@ -136,6 +206,7 @@ module.exports = {
     getPostController,
     getPostDetailsController,
     likePostController,
-    getFeedController
+    getFeedController,
+    unLikePostController
 }
 
