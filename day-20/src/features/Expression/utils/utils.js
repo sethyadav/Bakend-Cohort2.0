@@ -22,10 +22,9 @@ export const init = async ({landmarkerRef, videoRef, streamRef }) => {
       );
       streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true});
       videoRef.current.srcObject = streamRef.current;
-      await videoRef.current.play();
-
-    //   detect();
-    };
+       await videoRef.current.play();
+     //dedect()
+};
 
 export const detect = ({ landmarkerRef, videoRef, setExpression}) => {
       if (!landmarkerRef.current || !videoRef.current) return;
@@ -48,20 +47,23 @@ export const detect = ({ landmarkerRef, videoRef, setExpression}) => {
         const frownLeft = getScore("mouthFrownLeft");
         const frownRight = getScore("mouthFrownRight");
 
-        console.log(getScore("jawOpen"), getScore("browInnerUp"))
+        // console.log(getScore("jawOpen"), getScore("browInnerUp"))
+        console.log(getScore("mouthFrownLeft"))
         
 
-        let currentExpression = "Neutral 😐";
+        let currentExpression = "Neutral ";
 
         if(smileLeft > 0.5 && smileRight > 0.5) {
-          currentExpression = "Happy 😄";
+          currentExpression = "happy ";
         } else if (jawOpen > 0.6 && browUp > 0.5) {
-          currentExpression = "Surprised 😲";
+          currentExpression = "Surprised ";
         } else if (frownLeft > 0.01 && frownRight > 0.01) {
-          currentExpression = "Sad 😢";
+          currentExpression = "Sad ";
         }
 
         setExpression(currentExpression);
+
+        return currentExpression
       }
 
       // animationRef.current = requestAnimationFrame(detect);
